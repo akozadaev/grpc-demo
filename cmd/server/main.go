@@ -4,11 +4,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/akozadaev/grpc-demo/echo"
-	"github.com/joho/godotenv"
+	helper "github.com/akozadaev/grpc-demo/pkg"
 	"google.golang.org/grpc"
 	"log"
 	"net"
-	"os"
 )
 
 type server struct {
@@ -20,17 +19,8 @@ func (s *server) Echo(ctx context.Context, req *echo.EchoRequest) (*echo.EchoRes
 }
 
 func main() {
-	envPath := "."
-	envFileName := ".env"
-
-	fullPath := envPath + "/" + envFileName
-
-	if err := godotenv.Overload(fullPath); err != nil {
-		log.Printf("[ERROR] failed with %+v", "No .env file found")
-	}
-
-	network := os.Getenv("NETWORK")
-	address := os.Getenv("PORT")
+	network := helper.GetEnv("NETWORK")
+	address := helper.GetEnv("PORT")
 
 	lis, err := net.Listen(network, fmt.Sprintf(":%s", address))
 	if err != nil {
