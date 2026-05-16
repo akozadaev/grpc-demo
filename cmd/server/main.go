@@ -12,10 +12,37 @@ import (
 	"github.com/akozadaev/grpc-demo/echo"
 	helper "github.com/akozadaev/grpc-demo/pkg"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type server struct {
 	echo.UnimplementedEchoServiceServer
+}
+type mathServer struct {
+	echo.UnimplementedMathServiceServer
+}
+
+func (s *mathServer) Divide(ctx context.Context, req *echo.NumbersRequest) (*echo.NumberResponse, error) {
+	if req.B == 0 {
+		return nil, status.Error(codes.InvalidArgument, "division by zero is not allowed")
+	}
+	return &echo.NumberResponse{Result: req.A / req.B}, nil
+}
+
+func (s *mathServer) Add(ctx context.Context, req *echo.NumbersRequest) (*echo.NumberResponse, error) {
+
+	return &echo.NumberResponse{Result: req.A + req.B}, nil
+}
+
+func (s *mathServer) Subtract(ctx context.Context, req *echo.NumbersRequest) (*echo.NumberResponse, error) {
+
+	return &echo.NumberResponse{Result: req.A - req.B}, nil
+}
+
+func (s *mathServer) Multiply(ctx context.Context, req *echo.NumbersRequest) (*echo.NumberResponse, error) {
+
+	return &echo.NumberResponse{Result: req.A * req.B}, nil
 }
 
 func (s *server) Echo(ctx context.Context, req *echo.EchoRequest) (*echo.EchoResponse, error) {
@@ -30,7 +57,9 @@ func main() {
 	address := helper.GetEnv("PORT")
 
 	grpcServer := grpc.NewServer()
+
 	echo.RegisterEchoServiceServer(grpcServer, &server{})
+	echo.RegisterMathServiceServer(grpcServer, &mathServer{})
 
 	go func() {
 		lis, err := net.Listen(network, fmt.Sprintf(":%s", address))
