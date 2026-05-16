@@ -62,4 +62,9 @@ func main() {
 	}
 	log.Printf("Вычитание: %s", s)
 
+	derr, err := cm.Divide(ctx, &echo.NumbersRequest{A: 3, B: 0})
+	if err != nil {
+		log.Fatalf("ошибка: %v", err)
+	}
+	log.Printf("Деление: %s", derr)
 }
